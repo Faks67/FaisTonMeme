@@ -25,7 +25,7 @@ export function avatar(player, size) {
   return a;
 }
 
-const SOURCE_LABELS = { imgflip: 'Imgflip', youtube: 'YouTube', klipy: 'KLIPY', communaute: 'Communauté' };
+export const SOURCE_LABELS = { imgflip: 'Imgflip', memegen: 'memegen.link', openverse: 'Openverse', youtube: 'YouTube', klipy: 'KLIPY', communaute: 'Communauté' };
 export const KIND_LABELS = { Image: 'Image', Gif: 'GIF', Video: 'Vidéo' };
 
 /** Ligne de crédit sous le mème : source, auteur, lien d'origine. */
@@ -38,6 +38,11 @@ export function credit(t) {
     let label = 'Source : ' + (SOURCE_LABELS[t.source] || t.source);
     if (t.author) label += ' · ' + t.author;
     parts.push(el('span', { text: label }));
+    if (t.license) {
+      parts.push(t.licenseUrl
+        ? el('a', { href: t.licenseUrl, target: '_blank', rel: 'noopener noreferrer license', text: t.license })
+        : el('span', { text: t.license }));
+    }
   }
   if (t.pageUrl) parts.push(el('a', { href: t.pageUrl, target: '_blank', rel: 'noopener noreferrer', text: 'Voir l\'original' }));
   return el('p', { class: 'credit' }, parts);

@@ -29,16 +29,22 @@ async function loadLibrary() {
   render();
 }
 
+const PAGE = 120; // la bibliothèque compte des milliers de modèles : on les affiche par paquets
+let shown = PAGE;
+
 function render() {
   const q = $('q').value.trim().toLowerCase();
   const kind = $('kind').value;
   const source = $('source').value;
   const list = all.map(x => x.template).filter(t =>
     (!q || t.title.toLowerCase().includes(q)) && (!kind || t.kind === kind) && (!source || t.source === source));
-  $('count').textContent = `${list.length} modèle${list.length > 1 ? 's' : ''}`;
-  $('tiles').replaceChildren(...(list.length ? list.map(t => tile(t)) : [el('p', { class: 'empty', text: 'Aucun modèle ne correspond.' })]));
+  $('count').textContent = `${list.length.toLocaleString('fr-FR')} modèle${list.length > 1 ? 's' : ''}`;
+  const nodes = list.length ? list.slice(0, shown).map(t => tile(t)) : [el('p', { class: 'empty', text: 'Aucun modèle ne correspond.' })];
+  $('tiles').replaceChildren(...nodes);
+  $('more').hidden = list.length <= shown;
 }
 
-for (const id of ['q', 'kind', 'source']) $(id).addEventListener('input', render);
+for (const id of ['q', 'kind', 'source']) $(id).addEventListener('input', () => { shown = PAGE; render(); });
+$('more').addEventListener('click', () => { shown += PAGE; render(); });
 loadStatus().catch(() => {});
 loadLibrary().catch(() => { $('count').textContent = 'Impossible de charger la bibliothèque.'; });

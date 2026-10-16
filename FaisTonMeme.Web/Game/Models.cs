@@ -11,7 +11,8 @@ public sealed class GameSettings
     public int Rounds { get; set; } = 3;
     public int CaptionSeconds { get; set; } = 75;
     public int VoteSeconds { get; set; } = 12;
-    public int Rerolls { get; set; } = 2;
+    /// <summary>Changements de modèle autorisés à chaque manche.</summary>
+    public int Rerolls { get; set; } = 50;
     public bool Images { get; set; } = true;
     public bool Gifs { get; set; } = true;
     public bool Videos { get; set; } = true;
@@ -24,7 +25,7 @@ public sealed class GameSettings
             Rounds = Math.Clamp(Rounds, 1, 10),
             CaptionSeconds = Math.Clamp(CaptionSeconds, 20, 180),
             VoteSeconds = Math.Clamp(VoteSeconds, 5, 30),
-            Rerolls = Math.Clamp(Rerolls, 0, 5),
+            Rerolls = Math.Clamp(Rerolls, 0, 50),
             Images = Images || !any,
             Gifs = Gifs || !any,
             Videos = Videos || !any,
