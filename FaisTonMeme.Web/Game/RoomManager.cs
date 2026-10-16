@@ -19,6 +19,7 @@ public sealed class RoomManager(LibraryStore library, IHubContext<GameHub> hub, 
     static readonly TimeSpan HostGrace = TimeSpan.FromSeconds(8);
     static readonly TimeSpan LobbyGrace = TimeSpan.FromSeconds(45);
     static readonly TimeSpan EmptyRoomLifetime = TimeSpan.FromMinutes(15);
+    const double PhotoShare = 0.35;
 
     readonly ConcurrentDictionary<string, Room> _rooms = new();
     readonly ConcurrentDictionary<string, (string code, string playerId)> _byConnection = new();
@@ -203,7 +204,7 @@ public sealed class RoomManager(LibraryStore library, IHubContext<GameHub> hub, 
             RequireHost(room, p);
             if (room.Phase is not (Phase.Lobby or Phase.Final)) throw new HubException("La partie est déjà en cours.");
             if (room.Players.Count(x => x.Connected) < 2) throw new HubException("Il faut au moins 2 joueurs pour lancer la partie.");
-            foreach (var pl in room.Players) { pl.Score = 0; pl.RerollsLeft = room.Settings.Rerolls; }
+            foreach (var pl in room.Players) pl.Score = 0;
             room.Players.RemoveAll(x => !x.Connected);
             room.Round = 0;
             room.UsedTemplates.Clear();
@@ -293,6 +294,7 @@ public sealed class RoomManager(LibraryStore library, IHubContext<GameHub> hub, 
         room.Entries = new();
         foreach (var p in room.Players)
         {
+            p.RerollsLeft = room.Settings.Rerolls; // remis à zéro à chaque manche
             var t = PickTemplate(room) ?? library.All().First();
             room.Entries[p.Id] = new Entry { PlayerId = p.Id, Template = t, Captions = DefaultCaptions(t) };
         }
@@ -435,6 +437,12 @@ public sealed class RoomManager(LibraryStore library, IHubContext<GameHub> hub, 
         var kind = kinds[Random.Shared.Next(kinds.Count)];
         var candidates = fresh.Where(t => t.Kind == kind).ToList();
 
+        // Les photos Openverse sont bien plus nombreuses que les vrais modèles de mèmes :
+        // elles ne sortent que dans 35 % des tirages, quel que soit leur nombre.
+        var photos = candidates.Where(t => t.Source == OpenverseSource.Name).ToList();
+        if (photos.Count > 0 && photos.Count < candidates.Count)
+            candidates = Random.Shared.NextDouble() < PhotoShare ? photos : candidates.Except(photos).ToList();
+
         var oldest = library.OldestFirstSeen;
         var weights = candidates.Select(t => Weight(t, oldest)).ToArray();
         var roll = Random.Shared.NextDouble() * weights.Sum();
@@ -456,14 +464,15 @@ public sealed class RoomManager(LibraryStore library, IHubContext<GameHub> hub, 
     }
 
     /// <summary>
-    /// « Nouveau » : publié il y a moins de 7 jours, ou entré dans la bibliothèque il y a moins
-    /// de 7 jours (sauf lors du tout premier remplissage, où tout serait « nouveau »).
+    /// « Nouveau » : publié il y a moins de 7 jours, ou entré dans le classement Imgflip il y a moins
+    /// de 7 jours (sauf lors du tout premier remplissage, où tout serait « nouveau »). Les catalogues
+    /// memegen et Openverse ne suivent pas l'actualité, leurs modèles ne sont donc jamais « nouveaux ».
     /// </summary>
     public static bool IsNew(MemeTemplate t, DateTimeOffset oldest)
     {
         var now = DateTimeOffset.UtcNow;
         if (t.PublishedAt is { } pub && now - pub < TimeSpan.FromDays(7)) return true;
-        return now - t.FirstSeen < TimeSpan.FromDays(7) && t.FirstSeen - oldest > TimeSpan.FromHours(1);
+        return t.Source == ImgflipSource.Name && now - t.FirstSeen < TimeSpan.FromDays(7) && t.FirstSeen - oldest > TimeSpan.FromHours(1);
     }
 
     // ---------- Diffusion de l'état ----------
@@ -537,10 +546,10 @@ public sealed class KlipyItem
 }
 
 public sealed record TemplateDto(string Id, string Title, MediaKind Kind, string Source, string? MediaUrl, string? YouTubeId,
-    string? ThumbnailUrl, string? PageUrl, string? Author, int Width, int Height, int BoxCount, bool IsNew)
+    string? ThumbnailUrl, string? PageUrl, string? Author, string? License, string? LicenseUrl, int Width, int Height, int BoxCount, bool IsNew)
 {
     public static TemplateDto From(MemeTemplate t, bool isNew) => new(t.Id, t.Title, t.Kind, t.Source, t.MediaUrl, t.YouTubeId,
-        t.ThumbnailUrl, t.PageUrl, t.Author, t.Width, t.Height, t.BoxCount, isNew);
+        t.ThumbnailUrl, t.PageUrl, t.Author, t.License, t.LicenseUrl, t.Width, t.Height, t.BoxCount, isNew);
 }
 
 public sealed record PlayerDto(string Id, string Name, int Color, int Score, bool Connected, bool Done);

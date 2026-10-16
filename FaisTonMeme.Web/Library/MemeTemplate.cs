@@ -12,7 +12,7 @@ public sealed class MemeTemplate
     public string Id { get; set; } = "";
     public string Title { get; set; } = "";
     public MediaKind Kind { get; set; }
-    /// <summary>imgflip, youtube, klipy ou communaute.</summary>
+    /// <summary>imgflip, memegen, openverse, youtube, klipy ou communaute.</summary>
     public string Source { get; set; } = "";
     /// <summary>URL de l'image, du GIF ou du MP4 (absent pour YouTube, lu par le lecteur intégré).</summary>
     public string? MediaUrl { get; set; }
@@ -21,6 +21,9 @@ public sealed class MemeTemplate
     /// <summary>Page d'origine, affichée en crédit.</summary>
     public string? PageUrl { get; set; }
     public string? Author { get; set; }
+    /// <summary>Licence de l'image (Openverse), à afficher avec l'auteur.</summary>
+    public string? License { get; set; }
+    public string? LicenseUrl { get; set; }
     public int Width { get; set; }
     public int Height { get; set; }
     /// <summary>Nombre de zones de texte proposées (images seulement).</summary>

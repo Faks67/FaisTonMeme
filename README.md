@@ -21,7 +21,7 @@ Pour jouer avec des téléphones sur le même Wi-Fi, lance le serveur avec `dotn
 
 ## Déroulement d'une partie
 
-1. **Salon** : l'hôte crée la salle et partage le code ou le lien d'invitation. Il choisit le nombre de manches, les durées, le nombre de changements de modèle et les types de médias.
+1. **Salon** : l'hôte crée la salle et partage le code ou le lien d'invitation. Il choisit le nombre de manches, les durées, le nombre de changements de modèle autorisés à chaque manche (jusqu'à 50) et les types de médias.
 2. **Légende** : chaque joueur reçoit son propre modèle. Sur une image, les textes se placent en les faisant glisser. Sur un GIF ou une vidéo, la légende va dans un bandeau au-dessus. Le brouillon est enregistré au fil de la frappe : s'il n'est pas validé, il est pris tel quel à la fin du chrono.
 3. **Vote** : les mèmes défilent un par un, sans le nom de leur auteur. On note *Bof* (1 point), *Drôle* (2) ou *Légendaire* (3). On ne peut pas voter pour soi.
 4. **Résultats** : les auteurs sont révélés, les points sont ajoutés au classement, puis la manche suivante commence.
@@ -34,11 +34,15 @@ Si un joueur recharge la page ou perd la connexion, il retrouve sa place automat
 | Source | Contenu | Clé | Mise à jour |
 |---|---|---|---|
 | [Imgflip](https://imgflip.com/api) | Les ~100 modèles d'images les plus utilisés en ce moment | Aucune | Tâche planifiée du serveur (toutes les 6 h par défaut) |
+| [memegen.link](https://api.memegen.link) | ~180 modèles classiques vierges (projet open source), sans les doublons d'Imgflip | Aucune | Tâche planifiée du serveur |
+| [Openverse](https://api.openverse.org) | Plus de 2 000 photos d'animaux drôles sous licence Creative Commons | Aucune | Une récolte par jour au plus (limite de 200 requêtes par jour sans compte) |
 | [YouTube Data API](https://developers.google.com/youtube/v3) | Vidéos courtes récentes (7 derniers jours) sur les recherches configurées, triées par vues, SafeSearch strict | Gratuite (Google Cloud) | Tâche planifiée du serveur |
 | [KLIPY](https://docs.klipy.com) | GIF et clips tendance, localisés en français | Gratuite ([partner.klipy.com](https://partner.klipy.com)) | Chargés en direct au début de chaque partie |
 | Communauté | Modèles proposés par les joueurs sur `/proposer.html` | — | Après validation sur `/moderation.html` |
 
-Sans aucune clé, le jeu fonctionne avec Imgflip et les propositions validées. Les autres sources s'activent dès qu'on ajoute leur clé.
+Sans aucune clé, le jeu compte déjà plus de 2 000 modèles (Imgflip, memegen.link, Openverse et propositions validées). YouTube et KLIPY s'activent dès qu'on ajoute leur clé. Le nombre exact de modèles est affiché sur la page `/bibliotheque.html`.
+
+Les photos Openverse sont bien plus nombreuses que les modèles de mèmes classiques. Pour que les parties restent surtout faites de vrais mèmes, elles ne sortent que dans 35 % des tirages d'images.
 
 ### Pourquoi pas TikTok, Instagram ou X ?
 
@@ -50,7 +54,8 @@ Aucune de ces plateformes n'a d'API publique qui permette de récupérer leurs m
 
 - **YouTube** : les vidéos sont lues avec le lecteur YouTube intégré (`youtube-nocookie.com`), jamais téléchargées. Rien n'est écrit par-dessus le lecteur : la légende est dans un bandeau au-dessus. Les données de l'API sont supprimées si une vidéo n'a pas été revue depuis 30 jours.
 - **KLIPY** : leurs [exigences d'intégration](https://docs.klipy.com/integration-requirements) imposent que les appels partent du navigateur et que les médias soient chargés directement depuis leurs liens. Le navigateur de l'hôte récupère donc les tendances au lancement du salon, et le serveur garde seulement les liens en mémoire pour la partie. Rien n'est stocké ni recopié, et chaque GIF ou clip affiche « Powered by KLIPY ». La clé KLIPY est donc visible dans le navigateur : c'est prévu ainsi par KLIPY. Les filtres de contenu se règlent dans leur tableau de bord partenaire. Si tu veux un jour mettre KLIPY en cache côté serveur, il faut leur accord écrit (developers@klipy.com).
-- **Imgflip** : les images sont affichées depuis `i.imgflip.com`, avec un lien vers la page d'origine.
+- **Imgflip** et **memegen.link** : les images sont affichées depuis leurs serveurs, avec un lien vers la page d'origine.
+- **Openverse** : on ne demande que des licences qui autorisent la modification (ajouter une légende en est une), donc aucune licence « ND ». Le contenu adulte est exclu. L'auteur, la licence et le lien vers l'original sont affichés sous chaque photo. Les licences « NC » interdisent l'usage commercial : si le jeu devient un jour payant ou financé par la publicité, il faudra filtrer avec `license_type=commercial,modification`. Les recherches portent sur des animaux, pour éviter de légender des photos de personnes privées. Une photo gênante se retire depuis la page de modération.
 
 ## Configuration
 
@@ -65,6 +70,10 @@ copy FaisTonMeme.Web\appsettings.Local.example.json FaisTonMeme.Web\appsettings.
 | `FaisTonMeme:RefreshIntervalHours` | Intervalle entre deux mises à jour des sources | `6` |
 | `FaisTonMeme:AdminPassword` | Mot de passe de la page de modération | généré au premier lancement |
 | `FaisTonMeme:Imgflip:Enabled` | Active la source Imgflip | `true` |
+| `FaisTonMeme:Memegen:Enabled` | Active la source memegen.link | `true` |
+| `FaisTonMeme:Openverse:Enabled` | Active la source Openverse | `true` |
+| `FaisTonMeme:Openverse:Queries` | Recherches Openverse (12 pages de 20 photos maximum par recherche) | 15 recherches d'animaux |
+| `FaisTonMeme:Openverse:RefreshHours` | Délai minimum entre deux récoltes Openverse | `24` |
 | `FaisTonMeme:YouTube:ApiKey` | Clé de l'API YouTube Data v3 | vide (source inactive) |
 | `FaisTonMeme:YouTube:Queries` | Recherches lancées (100 unités de quota chacune, sur 10 000 par jour) | `meme #shorts`, `memes français #shorts` |
 | `FaisTonMeme:YouTube:MaxAgeDays` | Âge maximum des vidéos | `7` |
@@ -94,6 +103,8 @@ FaisTonMeme.Web/
 ├── Library/
 │   ├── LibraryStore.cs     Bibliothèque (data/library.json) et liste des modèles retirés
 │   ├── ImgflipSource.cs    Source Imgflip
+│   ├── MemegenSource.cs    Source memegen.link
+│   ├── OpenverseSource.cs  Source Openverse (photos Creative Commons)
 │   ├── YouTubeSource.cs    Source YouTube
 │   ├── LibraryRefresher.cs Tâche planifiée de mise à jour
 │   └── SubmissionStore.cs  Propositions des joueurs

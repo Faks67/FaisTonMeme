@@ -23,6 +23,8 @@ builder.Services.AddSingleton(dataPaths);
 builder.Services.AddSingleton<LibraryStore>();
 builder.Services.AddSingleton<SubmissionStore>();
 builder.Services.AddHttpClient<ImgflipSource>(c => c.DefaultRequestHeaders.UserAgent.ParseAdd("FaisTonMeme/1.0"));
+builder.Services.AddHttpClient<MemegenSource>(c => c.DefaultRequestHeaders.UserAgent.ParseAdd("FaisTonMeme/1.0"));
+builder.Services.AddHttpClient<OpenverseSource>(c => c.DefaultRequestHeaders.UserAgent.ParseAdd("FaisTonMeme/1.0 (jeu non commercial)"));
 builder.Services.AddHttpClient<YouTubeSource>(c => c.DefaultRequestHeaders.UserAgent.ParseAdd("FaisTonMeme/1.0"));
 builder.Services.AddSingleton<LibraryRefresher>();
 builder.Services.AddHostedService(sp => sp.GetRequiredService<LibraryRefresher>());
