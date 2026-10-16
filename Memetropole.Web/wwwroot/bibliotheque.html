@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Bibliothèque · Mèmetropole</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/"><img src="favicon.svg" alt="" width="32" height="32"><span>Mèmetropole</span></a>
+    <div class="topbar-right"><button class="icon-btn" id="theme-toggle" type="button" aria-label="Changer de thème"></button></div>
+  </header>
+  <main>
+    <div class="page-head">
+      <h1>Bibliothèque de modèles</h1>
+      <p>Les modèles viennent de sources officielles, mises à jour automatiquement, et des propositions des joueurs validées par la modération.
+        <a href="proposer.html">Proposer un modèle</a></p>
+    </div>
+
+    <div class="sources" id="sources"></div>
+    <p class="notice" id="klipy-note" hidden>Les GIF et clips KLIPY ne sont pas stockés ici : comme le demandent les conditions de KLIPY,
+      ils sont chargés en direct par le navigateur de l'hôte au début de chaque partie.</p>
+
+    <div class="filters">
+      <input id="q" type="search" placeholder="Rechercher un modèle" aria-label="Rechercher">
+      <select id="kind" aria-label="Type">
+        <option value="">Tous les types</option><option value="Image">Images</option><option value="Gif">GIF</option><option value="Video">Vidéos</option>
+      </select>
+      <select id="source" aria-label="Source">
+        <option value="">Toutes les sources</option><option value="imgflip">Imgflip</option><option value="youtube">YouTube</option><option value="communaute">Communauté</option>
+      </select>
+    </div>
+    <p class="hint" id="count"></p>
+    <div class="tiles" id="tiles"></div>
+  </main>
+  <script type="module" src="js/bibliotheque.js"></script>
+</body>
+</html>
