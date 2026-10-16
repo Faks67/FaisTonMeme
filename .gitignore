@@ -4,7 +4,7 @@ obj/
 *.user
 
 # Données locales : bibliothèque, propositions, fichiers envoyés, mot de passe de modération
-Memetropole.Web/data/
+FaisTonMeme.Web/data/
 
 # Clés d'API (ne jamais publier)
-Memetropole.Web/appsettings.Local.json
+FaisTonMeme.Web/appsettings.Local.json

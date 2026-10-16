@@ -1,6 +1,6 @@
-# Mèmetropole
+# Fais ton mème
 
-Jeu web multijoueur de mèmes. Les joueurs rejoignent une salle avec un code. À chaque manche, chacun reçoit un modèle tendance (image, GIF ou vidéo courte) et doit trouver la meilleure légende avant la fin du chrono. Ensuite, tout le monde note les mèmes des autres et un classement s'affiche. À la fin de la partie, un podium désigne le « maire de Mèmetropole ».
+Jeu web multijoueur de mèmes. Les joueurs rejoignent une salle avec un code. À chaque manche, chacun reçoit un modèle tendance (image, GIF ou vidéo courte) et doit trouver la meilleure légende avant la fin du chrono. Ensuite, tout le monde note les mèmes des autres et un classement s'affiche. À la fin de la partie, un podium désigne le roi du mème.
 
 Le jeu s'inspire du principe des jeux de légendes de mèmes, mais il a son propre nom, son propre logo et son propre design.
 
@@ -12,12 +12,12 @@ Prérequis : le [SDK .NET 8](https://dotnet.microsoft.com/download/dotnet/8.0).
 - **En ligne de commande** :
 
   ```bash
-  dotnet run --project Memetropole.Web
+  dotnet run --project FaisTonMeme.Web
   ```
 
 Pour tester à plusieurs sur un seul PC, ouvre **un onglet par joueur** : chaque onglet est un joueur différent.
 
-Pour jouer avec des téléphones sur le même Wi-Fi, lance le serveur avec `dotnet run --project Memetropole.Web --urls http://0.0.0.0:5180`, puis ouvre `http://<adresse-IP-du-PC>:5180` sur les téléphones. Le pare-feu Windows te demandera peut-être d'autoriser la connexion.
+Pour jouer avec des téléphones sur le même Wi-Fi, lance le serveur avec `dotnet run --project FaisTonMeme.Web --urls http://0.0.0.0:5180`, puis ouvre `http://<adresse-IP-du-PC>:5180` sur les téléphones. Le pare-feu Windows te demandera peut-être d'autoriser la connexion.
 
 ## Déroulement d'une partie
 
@@ -42,7 +42,7 @@ Sans aucune clé, le jeu fonctionne avec Imgflip et les propositions validées. 
 
 ### Pourquoi pas TikTok, Instagram ou X ?
 
-Aucune de ces plateformes n'a d'API publique qui permette de récupérer leurs mèmes. Aspirer leurs pages enfreint leurs conditions d'utilisation, et les vidéos appartiennent à leurs auteurs. Mèmetropole utilise donc seulement des API officielles, plus des modèles proposés par les joueurs et modérés.
+Aucune de ces plateformes n'a d'API publique qui permette de récupérer leurs mèmes. Aspirer leurs pages enfreint leurs conditions d'utilisation, et les vidéos appartiennent à leurs auteurs. Fais ton mème utilise donc seulement des API officielles, plus des modèles proposés par les joueurs et modérés.
 
 À noter également : Google a fermé l'API Tenor le 30 juin 2026, et Reddit ne prend plus de nouvelles demandes d'accès à son API publique après le 31 octobre 2026.
 
@@ -54,24 +54,24 @@ Aucune de ces plateformes n'a d'API publique qui permette de récupérer leurs m
 
 ## Configuration
 
-Les réglages se trouvent dans `Memetropole.Web/appsettings.json`. Les clés et le mot de passe vont dans `Memetropole.Web/appsettings.Local.json`, ignoré par Git. Copie le fichier d'exemple :
+Les réglages se trouvent dans `FaisTonMeme.Web/appsettings.json`. Les clés et le mot de passe vont dans `FaisTonMeme.Web/appsettings.Local.json`, ignoré par Git. Copie le fichier d'exemple :
 
 ```bash
-copy Memetropole.Web\appsettings.Local.example.json Memetropole.Web\appsettings.Local.json
+copy FaisTonMeme.Web\appsettings.Local.example.json FaisTonMeme.Web\appsettings.Local.json
 ```
 
 | Réglage | Rôle | Défaut |
 |---|---|---|
-| `Memetropole:RefreshIntervalHours` | Intervalle entre deux mises à jour des sources | `6` |
-| `Memetropole:AdminPassword` | Mot de passe de la page de modération | généré au premier lancement |
-| `Memetropole:Imgflip:Enabled` | Active la source Imgflip | `true` |
-| `Memetropole:YouTube:ApiKey` | Clé de l'API YouTube Data v3 | vide (source inactive) |
-| `Memetropole:YouTube:Queries` | Recherches lancées (100 unités de quota chacune, sur 10 000 par jour) | `meme #shorts`, `memes français #shorts` |
-| `Memetropole:YouTube:MaxAgeDays` | Âge maximum des vidéos | `7` |
-| `Memetropole:Klipy:ApiKey` | Clé KLIPY | vide (source inactive) |
-| `Memetropole:Klipy:Locale` / `ContentFilter` | Langue des tendances / niveau de filtre (`off`, `low`, `medium`, `high`) | `fr` / `high` |
+| `FaisTonMeme:RefreshIntervalHours` | Intervalle entre deux mises à jour des sources | `6` |
+| `FaisTonMeme:AdminPassword` | Mot de passe de la page de modération | généré au premier lancement |
+| `FaisTonMeme:Imgflip:Enabled` | Active la source Imgflip | `true` |
+| `FaisTonMeme:YouTube:ApiKey` | Clé de l'API YouTube Data v3 | vide (source inactive) |
+| `FaisTonMeme:YouTube:Queries` | Recherches lancées (100 unités de quota chacune, sur 10 000 par jour) | `meme #shorts`, `memes français #shorts` |
+| `FaisTonMeme:YouTube:MaxAgeDays` | Âge maximum des vidéos | `7` |
+| `FaisTonMeme:Klipy:ApiKey` | Clé KLIPY | vide (source inactive) |
+| `FaisTonMeme:Klipy:Locale` / `ContentFilter` | Langue des tendances / niveau de filtre (`off`, `low`, `medium`, `high`) | `fr` / `high` |
 
-Chaque réglage peut aussi être passé en variable d'environnement, par exemple `Memetropole__YouTube__ApiKey`.
+Chaque réglage peut aussi être passé en variable d'environnement, par exemple `FaisTonMeme__YouTube__ApiKey`.
 
 **Obtenir une clé YouTube** : dans la [Google Cloud Console](https://console.cloud.google.com/), crée un projet, active « YouTube Data API v3 », puis crée une clé API dans *Identifiants*.
 
@@ -79,13 +79,13 @@ Chaque réglage peut aussi être passé en variable d'environnement, par exemple
 
 - `/proposer.html` : un joueur envoie une image, un GIF, une vidéo MP4/WebM (15 Mo maximum), ou un lien YouTube ou direct. Le vrai type du fichier est vérifié, et chaque adresse IP est limitée à 5 propositions par 10 minutes.
 - `/moderation.html` : on valide ou refuse les propositions. On peut aussi retirer n'importe quel modèle de la bibliothèque : il ne reviendra pas, même si la source le propose à nouveau. Un bouton relance la mise à jour des sources sans attendre.
-- Le mot de passe s'affiche dans la console au démarrage. Il est enregistré dans `Memetropole.Web/data/mot-de-passe-moderation.txt`, sauf s'il est défini dans `AdminPassword`.
+- Le mot de passe s'affiche dans la console au démarrage. Il est enregistré dans `FaisTonMeme.Web/data/mot-de-passe-moderation.txt`, sauf s'il est défini dans `AdminPassword`.
 - Les fichiers en attente ne sont pas accessibles publiquement. Ils ne le deviennent qu'une fois validés.
 
 ## Architecture
 
 ```
-Memetropole.Web/
+FaisTonMeme.Web/
 ├── Program.cs              API minimale : config, bibliothèque, propositions, modération, hub SignalR
 ├── Game/
 │   ├── Models.cs           Salle, joueur, réglages, légendes
@@ -109,5 +109,5 @@ Memetropole.Web/
 
 - **Temps réel** : ASP.NET Core SignalR. Le serveur fait autorité : il gère les chronomètres, choisit les modèles et compte les votes. Chaque joueur reçoit sa propre vue de l'état, ce qui garde secrets les auteurs pendant le vote.
 - **Choix des modèles** : un type de média est d'abord tiré au hasard parmi ceux autorisés et disponibles, pour que les vidéos et les GIF sortent vraiment. Ensuite, un modèle est tiré en favorisant les nouveautés (moins de 7 jours) et le haut des classements. Un même modèle ne revient pas deux fois dans une partie, sauf si la bibliothèque est épuisée.
-- **Données** : fichiers JSON dans `Memetropole.Web/data/`. Les salles vivent en mémoire et disparaissent quand le serveur s'arrête.
+- **Données** : fichiers JSON dans `FaisTonMeme.Web/data/`. Les salles vivent en mémoire et disparaissent quand le serveur s'arrête.
 - **Front** : HTML, CSS et JavaScript, sans framework ni build. Adapté au mobile, avec thème clair et sombre. Le client SignalR est fourni dans `wwwroot/lib`.

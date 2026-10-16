@@ -1,0 +1,184 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Fais ton mème</title>
+  <meta name="description" content="Jeu multijoueur de mèmes : légende des modèles tendance, vote, grimpe au classement.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/app.css">
+  <script src="js/theme.js"></script>
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="Fais ton mème, accueil">
+      <img src="favicon.svg" alt="" width="32" height="32">
+      <span>Fais ton mème</span>
+    </a>
+    <div class="topbar-right">
+      <span id="room-chip" class="chip" hidden></span>
+      <button class="icon-btn" id="theme-toggle" type="button" aria-label="Changer de thème"></button>
+    </div>
+  </header>
+
+  <main id="app">
+    <!-- Accueil -->
+    <section class="screen" id="screen-home">
+      <div class="hero">
+        <h1>Légende. Vote.<br><span class="accent">Fais rire la salle.</span></h1>
+        <p class="lead">Chaque manche, tu reçois un modèle de mème tendance : image, GIF ou vidéo courte.
+          Trouve la meilleure légende avant la fin du chrono, puis note les créations des autres.</p>
+      </div>
+
+      <div class="card home-card">
+        <label class="field">
+          <span>Ton pseudo</span>
+          <input id="name" maxlength="20" autocomplete="nickname" placeholder="Ex. : Kévin du 93">
+        </label>
+        <button class="btn btn-primary btn-lg" id="btn-create" type="button">Créer une salle</button>
+        <div class="divider"><span>ou</span></div>
+        <div class="join-row">
+          <input id="code" maxlength="4" placeholder="CODE" autocapitalize="characters" aria-label="Code de la salle">
+          <button class="btn btn-secondary" id="btn-join" type="button">Rejoindre</button>
+        </div>
+        <p class="error" id="home-error" role="alert"></p>
+      </div>
+
+      <nav class="home-links">
+        <a href="bibliotheque.html">Voir la bibliothèque</a>
+        <a href="proposer.html">Proposer un modèle</a>
+      </nav>
+    </section>
+
+    <!-- Salon -->
+    <section class="screen" id="screen-lobby" hidden>
+      <div class="lobby-grid">
+        <div class="card">
+          <p class="eyebrow">Code de la salle</p>
+          <div class="room-code" id="lobby-code"></div>
+          <button class="btn btn-ghost" id="btn-copy" type="button">Copier le lien d'invitation</button>
+          <h2 class="section-title">Joueurs <span class="muted" id="lobby-count"></span></h2>
+          <ul class="player-list" id="lobby-players"></ul>
+        </div>
+
+        <div class="card">
+          <h2 class="section-title">Réglages</h2>
+          <form id="settings" class="settings">
+            <label class="field"><span>Manches</span>
+              <select name="rounds"><option>1</option><option>2</option><option selected>3</option><option>4</option><option>5</option><option>6</option><option>8</option><option>10</option></select>
+            </label>
+            <label class="field"><span>Temps pour légender</span>
+              <select name="captionSeconds"><option value="45">45 s</option><option value="60">1 min</option><option value="75" selected>1 min 15</option><option value="90">1 min 30</option><option value="120">2 min</option></select>
+            </label>
+            <label class="field"><span>Temps de vote par mème</span>
+              <select name="voteSeconds"><option value="8">8 s</option><option value="12" selected>12 s</option><option value="16">16 s</option><option value="20">20 s</option></select>
+            </label>
+            <label class="field"><span>Changements de modèle</span>
+              <select name="rerolls"><option>0</option><option>1</option><option selected>2</option><option>3</option><option>5</option></select>
+            </label>
+            <fieldset class="kinds">
+              <legend>Types de modèles</legend>
+              <label class="check"><input type="checkbox" name="images" checked> Images</label>
+              <label class="check"><input type="checkbox" name="gifs" checked> GIF</label>
+              <label class="check"><input type="checkbox" name="videos" checked> Vidéos</label>
+            </fieldset>
+          </form>
+          <p class="hint" id="lobby-sources"></p>
+          <button class="btn btn-primary btn-lg" id="btn-start" type="button">Lancer la partie</button>
+          <p class="hint center" id="lobby-wait">L'hôte lance la partie quand tout le monde est là.</p>
+          <p class="error" id="lobby-error" role="alert"></p>
+        </div>
+      </div>
+      <button class="btn btn-ghost leave" type="button" data-leave>Quitter la salle</button>
+    </section>
+
+    <!-- Légende -->
+    <section class="screen" id="screen-caption" hidden>
+      <div class="phase-bar">
+        <div>
+          <p class="eyebrow" id="caption-round"></p>
+          <h2>Légende ton mème</h2>
+        </div>
+        <div class="timer" data-timer><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/><circle class="timer-fill" cx="18" cy="18" r="16"/></svg><span></span></div>
+      </div>
+      <div class="caption-grid">
+        <div class="stage" id="caption-stage"></div>
+        <div class="card editor">
+          <div id="caption-inputs" class="caption-inputs"></div>
+          <p class="hint" id="caption-hint"></p>
+          <div class="editor-actions">
+            <button class="btn btn-secondary" id="btn-reroll" type="button"></button>
+            <button class="btn btn-primary" id="btn-done" type="button">J'ai fini</button>
+          </div>
+          <ul class="progress-list" id="caption-progress"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vote -->
+    <section class="screen" id="screen-vote" hidden>
+      <div class="phase-bar">
+        <div>
+          <p class="eyebrow" id="vote-count"></p>
+          <h2>À toi de noter</h2>
+        </div>
+        <div class="timer" data-timer><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/><circle class="timer-fill" cx="18" cy="18" r="16"/></svg><span></span></div>
+      </div>
+      <div class="vote-layout">
+        <div class="stage" id="vote-stage"></div>
+        <div class="vote-panel">
+          <div class="vote-buttons" id="vote-buttons">
+            <button class="vote-btn" data-score="1" type="button"><strong>Bof</strong><span>1 point</span></button>
+            <button class="vote-btn" data-score="2" type="button"><strong>Drôle</strong><span>2 points</span></button>
+            <button class="vote-btn" data-score="3" type="button"><strong>Légendaire</strong><span>3 points</span></button>
+          </div>
+          <p class="mine-note" id="vote-mine" hidden>C'est ton mème. Croise les doigts.</p>
+          <p class="hint center" id="vote-progress"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Résultats de manche -->
+    <section class="screen" id="screen-round" hidden>
+      <div class="phase-bar">
+        <div>
+          <p class="eyebrow" id="round-title"></p>
+          <h2>Résultats de la manche</h2>
+        </div>
+        <div class="timer" data-timer><svg viewBox="0 0 36 36"><circle cx="18" cy="18" r="16"/><circle class="timer-fill" cx="18" cy="18" r="16"/></svg><span></span></div>
+      </div>
+      <div class="results-grid" id="round-results"></div>
+      <div class="card">
+        <h2 class="section-title">Classement</h2>
+        <ol class="scoreboard" id="round-scoreboard"></ol>
+      </div>
+    </section>
+
+    <!-- Fin de partie -->
+    <section class="screen" id="screen-final" hidden>
+      <h1 class="final-title">Et le roi du mème est…</h1>
+      <div class="podium" id="podium"></div>
+      <div class="card">
+        <h2 class="section-title">Classement final</h2>
+        <ol class="scoreboard" id="final-scoreboard"></ol>
+      </div>
+      <h2 class="section-title" id="highlights-title">Les meilleurs mèmes de la partie</h2>
+      <div class="results-grid" id="highlights"></div>
+      <div class="final-actions">
+        <button class="btn btn-primary btn-lg" id="btn-replay" type="button">Rejouer</button>
+        <button class="btn btn-secondary" id="btn-lobby" type="button">Retour au salon</button>
+        <p class="hint center" id="final-wait">L'hôte peut relancer une partie.</p>
+        <button class="btn btn-ghost" type="button" data-leave>Quitter la salle</button>
+      </div>
+    </section>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="lib/signalr.min.js"></script>
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
